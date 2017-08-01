@@ -119,6 +119,43 @@
 						</slot>
 					</li>
 				</ul>
+
+				<ul class="vue-slider-piecewise">
+					<li v-for="(piecewiseObj, index) in piecewiseDotWrap2" :style="[piecewiseDotStyle, piecewiseObj.style]">
+						<slot
+							name="piecewiseL"
+							:label="piecewiseObj.label"
+							:index="index"
+							:first="index === 0"
+							:last="index === piecewiseDotWrap.length - 1"
+						>
+							<span
+								v-if="piecewise"
+								class="vue-slider-piecewise-dot"
+								:style="[ piecewiseStyle, piecewiseObj.inRange ? piecewiseActiveStyle : null ]"
+							></span>
+						</slot>
+
+						<slot
+							name="label"
+							:label="piecewiseObj.label"
+							:index="index"
+							:first="index === 0"
+							:last="index === piecewiseDotWrap.length - 1"
+						>
+							<span
+								v-if="piecewiseLabel"
+								class="vue-slider-piecewise-label second"
+								:style="[ labelStyle, piecewiseObj.inRange ? labelActiveStyle : null ]"
+								style="margin-left: -55px !important"
+							>
+								{{ piecewiseObj.label }}
+							</span>
+						</slot>
+					</li>
+				</ul>
+
+
 			</template>
 			<div ref="process" class="vue-slider-process" :style="processStyle"></div>
 		</div>
@@ -145,6 +182,10 @@ export default {
 			default: 6
 		},
 		data: {
+			type: Array,
+			default: null
+		},
+		data2: {
 			type: Array,
 			default: null
 		},
@@ -413,7 +454,32 @@ export default {
 				})
 			}
 			return arr
-		}
+		},
+		piecewiseDotWrap2() {
+			if (!this.piecewise && !this.piecewiseLabel) {
+				return false
+			}
+
+			let arr = []
+			let gap = (this.size - (this.direction === 'vertical' ? this.width : this.height)) / this.total
+			for (let i = 0; i <= this.total; i++) {
+				let style = this.direction === 'vertical' ? {
+					bottom: `${this.gap * i - this.width / 2}px`,
+					left: 0
+				} : {
+					left: `${this.gap * i - this.height / 2}px`,
+					top: '0'
+				}
+				let index = this.reverse ? (this.total - i) : i
+				let label = this.data2 ? this.data2[index] : (this.spacing * index) + this.min
+				arr.push({
+					style,
+					label: this.formatter ? this.formatting(label) : label,
+					inRange: index >= this.indexRange[0] && index <= this.indexRange[1]
+				})
+			}
+			return arr
+		},
 	},
 	watch: {
 		value(val) {
@@ -948,6 +1014,11 @@ export default {
 	transform: translate(8px, -50%);
 	visibility: visible;
 }
+
+.vue-slider-piecewise li .second {
+	margin-left: -55px !important;
+}
+
 .vue-slider-sr-only {
    clip: rect(1px, 1px, 1px, 1px);
    height: 1px;
