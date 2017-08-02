@@ -120,7 +120,7 @@
 					</li>
 				</ul>
 
-				<ul class="vue-slider-piecewise">
+				<ul v-if="showSecondLabels" class="vue-slider-piecewise">
 					<li v-for="(piecewiseObj, index) in piecewiseDotWrap2" :style="[piecewiseDotStyle, piecewiseObj.style]">
 						<slot
 							name="piecewiseL"
@@ -146,8 +146,7 @@
 							<span
 								v-if="piecewiseLabel"
 								class="vue-slider-piecewise-label second"
-								:style="[ labelStyle, piecewiseObj.inRange ? labelActiveStyle : null ]"
-								style="margin-left: -55px !important"
+								:style="[ labelStyle2, piecewiseObj.inRange ? labelActiveStyle2 : null ]"
 							>
 								{{ piecewiseObj.label }}
 							</span>
@@ -266,7 +265,13 @@ export default {
 		bgStyle: Object,
 		tooltipStyle: [Array, Object],
 		labelStyle: Object,
-		labelActiveStyle: Object
+		labelStyle2: Object,
+		showSecondLabels: {
+			type: Boolean,
+			default: false
+		},
+		labelActiveStyle: Object,
+		labelActiveStyle2: Object,
 	},
 	computed: {
 		flowDirection() {
@@ -474,7 +479,7 @@ export default {
 				let label = this.data2 ? this.data2[index] : (this.spacing * index) + this.min
 				arr.push({
 					style,
-					label: this.formatter ? this.formatting(label) : label,
+					label: label,
 					inRange: index >= this.indexRange[0] && index <= this.indexRange[1]
 				})
 			}
